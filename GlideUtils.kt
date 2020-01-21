@@ -1,6 +1,5 @@
 package utils
 
-
 import android.content.Context
 import android.graphics.Bitmap
 import android.widget.ImageView
@@ -21,16 +20,40 @@ object GlideUtils {
             drawImage(imageURL, imageView)
         }
 
-        fun setRoundCorners(roundCorners: Int = -1) {
+        fun setCenterCrop(): iteratorOption {
+            this.setDrawOptions("centerCrop")
+
+            return iteratorOption()
+        }
+
+        fun setCircleCrop(): iteratorOption {
+            this.setDrawOptions("circleCrop")
+
+            return iteratorOption()
+        }
+
+        fun setCenterInside(): iteratorOption {
+            this.setDrawOptions("centerInside")
+
+            return iteratorOption()
+        }
+
+        fun setRoundCorners(roundCorners: Int = -1): iteratorOption {
             setRoundCorners(roundCorners)
+
+            return iteratorOption()
         }
 
-        fun setDrawOptions(drawType: String) {
+        fun setDrawOptions(drawType: String): iteratorOption {
             setDrawOptions(drawType)
+
+            return iteratorOption()
         }
 
-        fun setSize(width: Int = -1, height: Int = -1) {
+        fun setSize(width: Int = -1, height: Int = -1): iteratorOption {
             setSize(width, height)
+
+            return iteratorOption()
         }
     }
 
@@ -97,7 +120,7 @@ object GlideUtils {
 
         return iteratorOption()
     }
-    
+
     fun draw(drawType: String, context: Context, imageURL: String, imageView: ImageView, useBitmap:Boolean = false, quality: Int = 100, width: Int = -1, height: Int = -1, roundCorners: Int = -1) {
         glideInstance = getContext(context, useBitmap)
 
