@@ -42,9 +42,7 @@ object GlideUtils {
             context = context as RequestManager
         }
 
-        if (context is RequestManager) {
-            context = (context as RequestManager)
-        } else {
+        if (!(context is RequestManager) {
             (context is RequestBuilder<*>) {
                 context = context as RequestBuilder<Bitmap>
             }
