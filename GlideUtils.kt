@@ -42,12 +42,6 @@ object GlideUtils {
             context = context as RequestManager
         }
 
-        return context
-    }
-
-    fun draw(drawType: String, context: Context, imageURL: String, imageView: ImageView, useBitmap:Boolean = false, quality: Int = 100, width: Int = -1, height: Int = -1, roundCorners: Int = -1) {
-        var context:Any = getContext(context, useBitmap)
-
         if (context is RequestManager) {
             context = (context as RequestManager)
         } else {
@@ -55,6 +49,12 @@ object GlideUtils {
                 context = context as RequestBuilder<Bitmap>
             }
         }
+
+        return context
+    }
+
+    fun draw(drawType: String, context: Context, imageURL: String, imageView: ImageView, useBitmap:Boolean = false, quality: Int = 100, width: Int = -1, height: Int = -1, roundCorners: Int = -1) {
+        var context:Any = getContext(context, useBitmap)
 
         if (!::drawOption.isInitialized) {
             if (width == -1 && height == -1) {
