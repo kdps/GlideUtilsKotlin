@@ -88,13 +88,21 @@ object GlideUtils {
         drawOption = drawOption.transform(RoundedCorners(roundCorners))
     }
 
+    fun getDrawObject(context: Context, quality: Int = 100): iteratorOption {
+        glideInstance = getContext(context)
+
+        if (!::drawOption.isInitialized) {
+            drawOption = RequestOptions.encodeQualityOf(100)
+        }
+
+        return iteratorOption()
+    }
+    
     fun draw(drawType: String, context: Context, imageURL: String, imageView: ImageView, useBitmap:Boolean = false, quality: Int = 100, width: Int = -1, height: Int = -1, roundCorners: Int = -1) {
         glideInstance = getContext(context, useBitmap)
 
         if (!::drawOption.isInitialized) {
-            if (width == -1 && height == -1) {
-                drawOption = RequestOptions.encodeQualityOf(100)
-            }
+            drawOption = RequestOptions.encodeQualityOf(100)
         }
 
         if (width != -1 && height != 1) {
