@@ -1,5 +1,6 @@
 package utils
 
+
 import android.content.Context
 import android.graphics.Bitmap
 import android.widget.ImageView
@@ -13,6 +14,25 @@ object GlideUtils {
 
     lateinit var drawOption: RequestOptions
     lateinit var instance: Glide
+    lateinit var glideInstance: Any
+
+    class iteratorOption {
+        fun drawImage(imageURL: String, imageView: ImageView) {
+            drawImage(imageURL, imageView)
+        }
+
+        fun setRoundCorners(roundCorners: Int = -1) {
+            setRoundCorners(roundCorners)
+        }
+
+        fun setDrawOptions(drawType: String) {
+            setDrawOptions(drawType)
+        }
+
+        fun setSize(width: Int = -1, height: Int = -1) {
+            setSize(width, height)
+        }
+    }
 
     fun setInstance(context: Context) {
         if (!::instance.isInitialized) {
@@ -34,46 +54,58 @@ object GlideUtils {
     }
 
     fun getContext (context: Context, useBitmap:Boolean = false): Any {
-        var context:Any = Glide.with(context)
+        glideInstance = Glide.with(context)
 
         if (useBitmap) {
-            context = (context as RequestManager).asBitmap()
+            glideInstance = (glideInstance as RequestManager).asBitmap()
         } else {
-            context = context as RequestManager
+            glideInstance = glideInstance as RequestManager
         }
 
-        if (!(context is RequestManager)) {
-            (context is RequestBuilder<*>) {
-                context = context as RequestBuilder<Bitmap>
+        if (!(glideInstance is RequestManager)) {
+            (glideInstance is RequestBuilder<*>) {
+                glideInstance = glideInstance as RequestBuilder<Bitmap>
             }
         }
 
         return context
     }
 
+    fun setSize(width: Int = -1, height: Int = -1) {
+        var _width = width
+        var _height = height
+
+        if (width == -1 && height != -1) {
+            var _width = height
+        } else if (width != -1 && height == -1) {
+            var _height = width
+        }
+
+        drawOption = drawOption.override(_width, _height)
+    }
+
+    fun setRoundCorners(roundCorners: Int = -1) {
+        drawOption = drawOption.transform(RoundedCorners(roundCorners))
+    }
+
     fun draw(drawType: String, context: Context, imageURL: String, imageView: ImageView, useBitmap:Boolean = false, quality: Int = 100, width: Int = -1, height: Int = -1, roundCorners: Int = -1) {
-        var context:Any = getContext(context, useBitmap)
+        glideInstance = getContext(context, useBitmap)
 
         if (!::drawOption.isInitialized) {
             if (width == -1 && height == -1) {
                 drawOption = RequestOptions.encodeQualityOf(100)
-            } else {
-                var _width = width
-                var _height = height
-
-                if (width == -1 && height != -1) {
-                    var _width = height
-                } else if (width != -1 && height == -1) {
-                    var _height = width
-                }
-
-                drawOption = RequestOptions().override(_width, _height)
             }
         }
 
-        if (roundCorners != -1) {
-            drawOption = drawOption.transform(RoundedCorners(roundCorners))
+        if (width != -1 && height != 1) {
+            setSize(width, height)
         }
+
+        if (roundCorners != -1) {
+            setRoundCorners(roundCorners)
+        }
+
+        setDrawOptions(drawType)
 
         when (drawType) {
             "circleCrop" -> {
@@ -90,27 +122,54 @@ object GlideUtils {
             }
         }
 
-        if (context is RequestManager) {
-            context = (context as RequestManager)
+        drawImage(imageURL, imageView)
+    }
 
-            (context as RequestManager).load(imageURL).apply(drawOption).into(imageView)
-        } else if (context is RequestBuilder<*>) {
-            context = (context as RequestBuilder<Bitmap>)
-
-            (context as RequestBuilder<Bitmap>).load(imageURL).apply(drawOption).into(imageView)
+    fun setDrawOptions(drawType: String) {
+        when (drawType) {
+            "circleCrop" -> {
+                drawOption = drawOption.circleCrop()
+            }
+            "centerCrop" -> {
+                drawOption = drawOption.centerCrop()
+            }
+            "centerInside" -> {
+                drawOption = drawOption.centerInside()
+            }
+            else -> {
+                drawOption = drawOption.centerCrop()
+            }
         }
     }
 
-    fun drawCenterInside(context: Context, imageURL: String, imageView: ImageView, useBitmap:Boolean = false, quality: Int = 100, width: Int = -1, height: Int = -1, roundCorners: Int = -1) {
+    fun drawImage(imageURL: String, imageView: ImageView) {
+        if (glideInstance is RequestManager) {
+            glideInstance = (glideInstance as RequestManager)
+
+            (glideInstance as RequestManager).load(imageURL).apply(drawOption).into(imageView)
+        } else if (glideInstance is RequestBuilder<*>) {
+            glideInstance = (glideInstance as RequestBuilder<Bitmap>)
+
+            (glideInstance as RequestBuilder<Bitmap>).load(imageURL).apply(drawOption).into(imageView)
+        }
+    }
+
+    fun drawCenterInside(context: Context, imageURL: String, imageView: ImageView, useBitmap:Boolean = false, quality: Int = 100, width: Int = -1, height: Int = -1, roundCorners: Int = -1): iteratorOption {
         this.draw("centerInside", context, imageURL, imageView, useBitmap, quality, width, height, roundCorners)
+
+        return iteratorOption()
     }
 
-    fun drawCircleCrop(context: Context, imageURL: String, imageView: ImageView, useBitmap:Boolean = false, quality: Int = 100, width: Int = -1, height: Int = -1, roundCorners: Int = -1) {
+    fun drawCircleCrop(context: Context, imageURL: String, imageView: ImageView, useBitmap:Boolean = false, quality: Int = 100, width: Int = -1, height: Int = -1, roundCorners: Int = -1): iteratorOption {
         this.draw("circleCrop", context, imageURL, imageView, useBitmap, quality, width, height, roundCorners)
+
+        return iteratorOption()
     }
 
-    fun drawCenterCrop(context: Context, imageURL: String, imageView: ImageView, useBitmap:Boolean = false, quality: Int = 100, width: Int = -1, height: Int = -1, roundCorners: Int = -1) {
+    fun drawCenterCrop(context: Context, imageURL: String, imageView: ImageView, useBitmap:Boolean = false, quality: Int = 100, width: Int = -1, height: Int = -1, roundCorners: Int = -1): iteratorOption {
         this.draw("circleCrop", context, imageURL, imageView, useBitmap, quality, width, height, roundCorners)
+
+        return iteratorOption()
     }
 }
 
